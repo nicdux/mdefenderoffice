@@ -33,23 +33,7 @@ Crie um arquivo `.txt` com os domínios separados por vírgulas, **em uma única
 
 Salve o arquivo como `dominios.txt` em um local acessível, como `C:\Scripts\dominios.txt`.
 
----
-## 🛠️ Script PowerShell
-# Conectar ao Exchange Online
-Connect-ExchangeOnline -UserPrincipalName <seu_user_principal_name>
 
-# Caminho do arquivo com os domínios
-$domainsRaw = Get-Content -Path "C:\Scripts\dominios.txt"
-
-# Separar, limpar e preparar os domínios
-$domains = $domainsRaw -join "," -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
-
-# Dividir em grupos de até 20 domínios (limite do Defender)
-$domainGroups = [System.Collections.Generic.List[Object]]::new()
-for ($i = 0; $i -lt $domains.Count; $i += 20) {
-    $group = $domains[$i..([Math]::Min($i + 19, $domains.Count - 1))]
-    $domainGroups.Add($group)
-}
 
 # Inserir cada grupo na Allow List com expiração de 45 dias
 foreach ($group in $domainGroups) {
