@@ -1,6 +1,3 @@
-# mdefenderoffice
-cript PowerShell para Adicionar Domínios na Tenant Allow/Block List (Microsoft 365 Defender)
-
 #  Script PowerShell para Adicionar Domínios na Tenant Allow/Block List (Microsoft 365 Defender)
 
 Este script PowerShell permite adicionar domínios (ou endereços de e-mail) à **Tenant Allow/Block List** do Microsoft Defender para Office 365, ignorando vereditos de spam, phishing e mensagens em massa com base em inteligência artificial.  
