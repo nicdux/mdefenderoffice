@@ -9,43 +9,68 @@ Ideal para times de segurança e e-mail que lidam com falsos positivos no filtro
 
 ---
 
-##Requisitos
+# Criar script PowerShell comentado
+powershell_script = """# ===============================================
+# Script: Add-TenantAllowBlockList.ps1
+# Autor: [Seu Nome]
+# Descrição:
+#     Este script adiciona domínios ou endereços de e-mail
+#     à lista de permissões (Allow) da Tenant Allow/Block List
+#     do Microsoft Defender para Office 365.
+#     Ele aceita um arquivo .txt com os domínios separados por vírgula
+#     e os adiciona em blocos de até 20 entradas, como exigido pela plataforma.
+# ===============================================
 
-- Permissão no tenant para executar `New-TenantAllowBlockListItems`.
-- Módulo `ExchangeOnlineManagement` instalado.
-- Autenticação via `Connect-ExchangeOnline`.
+# -------- CONFIGURAÇÃO --------
 
----
+# Conectar ao Exchange Online com uma conta com permissões adequadas
+Connect-ExchangeOnline -UserPrincipalName <seu_user_principal_name>
 
-## O que o script faz?
+# Defina o caminho para o arquivo que contém os domínios separados por vírgula
+$domainsRaw = Get-Content -Path "C:\\Scripts\\dominios.txt"
 
-- Lê domínios de um arquivo `.txt` separado por vírgulas.
-- Remove espaços extras e entradas vazias.
-- Divide os domínios em blocos de até 20 (limite do Microsoft Defender).
-- Adiciona os domínios à **lista de permissões** (`Allow`) com expiração automática de 45 dias após o último uso.
+# -------- PROCESSAMENTO DOS DOMÍNIOS --------
 
----
+# Junta todos os dados em uma única string (caso haja múltiplas linhas),
+# separa por vírgula, remove espaços e entradas vazias
+$domains = $domainsRaw -join "," -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne "" }
 
-## 🗂 Exemplo de arquivo `dominios.txt`
+# Cria uma lista de grupos com no máximo 20 domínios cada
+$domainGroups = [System.Collections.Generic.List[Object]]::new()
+for ($i = 0; $i -lt $domains.Count; $i += 20) {
+    $group = $domains[$i..([Math]::Min($i + 19, $domains.Count - 1))]
+    $domainGroups.Add($group)
+}
 
-Crie um arquivo `.txt` com os domínios separados por vírgulas, **em uma única linha**, como no exemplo abaixo:
+# -------- INSERÇÃO NA ALLOW LIST --------
 
+# Para cada grupo de até 20 domínios, executa o cmdlet de inserção
+foreach ($group in $domainGroups) {
+    Write-Host "Adicionando grupo com domínios: $($group -join ', ')" -ForegroundColor Cyan
+    
+    # Adiciona os domínios com expiração automática de 45 dias após o último uso
+    New-TenantAllowBlockListItems -ListType Sender -Allow -Entries $group -RemoveAfterDays 45
+}
 
-Salve o arquivo como `dominios.txt` em um local acessível, como `C:\Scripts\dominios.txt`.
+# -------- FIM --------
+Write-Host "Processo concluído com sucesso." -ForegroundColor Green
+"""
 
+# Salvar o script em um arquivo .ps1
+powershell_path = Path("/mnt/data/Add-TenantAllowBlockList.ps1")
+powershell_path.write_text(powershell_script, encoding="utf-8")
 
-Resultado Esperado
-Cada grupo de até 20 domínios será adicionado à lista de permissões, e permanecerá ativo por 45 dias após o último uso.
+# Também salvar o exemplo de domínio
+example_domains = "pacificaint.com,alerte.com.br,gympass.com,gympass.commail-seguro.com,mail-sec.com,securityapp.cloud,ultra.2fa.com-token-auth.com,ultra.mail.kb4.io,ultra.com.br"
+example_path = Path("/mnt/data/dominios.txt")
+example_path.write_text(example_domains, encoding="utf-8")
 
-A alteração será visível no portal do Microsoft Defender em:
-https://security.microsoft.com/securitysettings/emailandcollab/emailallowblocklist
+# Compactar os arquivos para ZIP
+import zipfile
 
- Dica Extra
-Se quiser validar rapidamente se um domínio já está na list
-Get-TenantAllowBlockListItems -ListType Sender -ListSubType Allow | Where-Object { $_.Entries -like "*dominio.com*" }
+zip_path = "/mnt/data/tenant-allowlist-script.zip"
+with zipfile.ZipFile(zip_path, "w") as zipf:
+    zipf.write(powershell_path, arcname="Add-TenantAllowBlockList.ps1")
+    zipf.write(example_path, arcname="dominios.txt")
 
-Créditos
-Criado por [Seu Nome], com base em necessidades reais de automação para segurança de e-mails no Microsoft 365.
-Contribuições são bem-vindas!
-
-
+zip_path
