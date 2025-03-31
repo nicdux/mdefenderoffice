@@ -34,10 +34,7 @@ Crie um arquivo `.txt` com os domínios separados por vírgulas, **em uma única
 Salve o arquivo como `dominios.txt` em um local acessível, como `C:\Scripts\dominios.txt`.
 
 ---
-
 ## 🛠️ Script PowerShell
-
-
 # Conectar ao Exchange Online
 Connect-ExchangeOnline -UserPrincipalName <seu_user_principal_name>
 
@@ -58,7 +55,7 @@ for ($i = 0; $i -lt $domains.Count; $i += 20) {
 foreach ($group in $domainGroups) {
     Write-Host "Adicionando grupo com domínios: $($group -join ', ')" -ForegroundColor Cyan
     New-TenantAllowBlockListItems -ListType Sender -Allow -Entries $group -RemoveAfterDays 45
-}
+#}
 
 Resultado Esperado
 Cada grupo de até 20 domínios será adicionado à lista de permissões, e permanecerá ativo por 45 dias após o último uso.
