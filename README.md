@@ -1,7 +1,6 @@
-from pathlib import Path
+PowerShell Script: Tenant Allow/Block List Automation
 
-# Conteúdo do Markdown
-markdown_content = """# 🚀 Script PowerShell para Adicionar Domínios na Tenant Allow/Block List (Microsoft 365 Defender)
+Este repositório contém um script PowerShell automatizado para adicionar domínios ou endereços de e-mail à **Tenant Allow/Block List** do Microsoft Defender para Office 365, facilitando o gerenciamento de falsos positivos e garantindo a entrega de mensagens legítimas.
 
 Este script PowerShell permite adicionar domínios (ou endereços de e-mail) à **Tenant Allow/Block List** do Microsoft Defender para Office 365, ignorando vereditos de spam, phishing e mensagens em massa com base em inteligência artificial.  
 
