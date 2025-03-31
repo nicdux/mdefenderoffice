@@ -34,13 +34,6 @@ Crie um arquivo `.txt` com os domínios separados por vírgulas, **em uma única
 Salve o arquivo como `dominios.txt` em um local acessível, como `C:\Scripts\dominios.txt`.
 
 
-
-# Inserir cada grupo na Allow List com expiração de 45 dias
-foreach ($group in $domainGroups) {
-    Write-Host "Adicionando grupo com domínios: $($group -join ', ')" -ForegroundColor Cyan
-    New-TenantAllowBlockListItems -ListType Sender -Allow -Entries $group -RemoveAfterDays 45
-#}
-
 Resultado Esperado
 Cada grupo de até 20 domínios será adicionado à lista de permissões, e permanecerá ativo por 45 dias após o último uso.
 
